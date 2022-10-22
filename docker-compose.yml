@@ -1,0 +1,22 @@
+version: "3"
+
+services:
+  openresty:
+    image: "openresty/openresty:alpine"
+    network_mode: "host"
+    restart: "always"
+    volumes:
+      - "/etc/localtime:/etc/localtime"
+      - "./conf/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf"
+      - "./conf/proxy.conf:/usr/local/openresty/nginx/conf/proxy.conf"
+      - "./conf/log.conf:/usr/local/openresty/nginx/conf/log.conf"
+      - "./logs:/usr/local/openresty/nginx/logs"
+      - "./vhost:/etc/nginx/conf.d"
+  filebeat:
+    image: "docker.elastic.co/beats/filebeat:7.17.6"
+    restart: "always"
+    volumes:
+      - "/etc/localtime:/etc/localtime"
+      - "./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml"
+      - "./logs:/tmp/logs"
+      - "./filebeat/data:/usr/share/filebeat/data"

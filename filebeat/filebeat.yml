@@ -1,0 +1,35 @@
+filebeat.inputs:
+- type: filestream
+  enabled: true
+  id: openresty
+  paths:
+    - /tmp/logs/*access_nginx.log
+ 
+processors:
+  - drop_fields:
+      fields: ["agent", "ecs", "log", "input"]
+
+  - decode_json_fields:
+      fields: ['message']
+      target: ''
+      overwrite_keys: true
+
+  - timestamp:
+      # 格式化时间值 给 时间戳 
+      field: time
+      # 使用我国东八区时间  解析log时间
+      timezone: Asia/Shanghai
+      layouts:
+        - '2006-01-02 15:04:05'
+        - '2006-01-02 15:04:05.999'
+
+setup.template.enabled: false
+setup.ilm.enabled: false
+logging.metrics.enabled: false
+
+output.elasticsearch:
+  enable: true
+  hosts: ["192.168.102.78:9200"]
+  username: "elastic"
+  password: "1qaz2wsx"
+  index: "openresty_access_log_%{+yyyy.MM.dd}"
